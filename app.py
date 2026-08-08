@@ -133,9 +133,8 @@ def start_cloning():
     if not origin or not dest:
         return jsonify({"success": False, "error": "ID de Origem e Destino são obrigatórios."})
 
-    # Salva os filtros no config.json
-    CONFIG_FILE = Path('config.json')
-    CONFIG_FILE.write_text(json.dumps(filters))
+    # Salva os filtros preservando as credenciais no config.json
+    save_config(filters)
 
     # Reseta o progresso
     PROGRESS_FILE.write_text(json.dumps({
