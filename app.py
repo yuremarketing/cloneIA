@@ -21,6 +21,10 @@ if not PROGRESS_FILE.exists():
         "msg_total": 0
     }))
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/')
 def index():
     return render_template('index.html')
