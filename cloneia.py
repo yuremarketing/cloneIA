@@ -240,14 +240,18 @@ async def main():
         dest = await client.get_entity(dest_id)
         
         posted = load_posted(origin_id, dest_id)
-        update_status(status="analyzing", message="Buscando mensagens...")
+        update_status(status="analyzing", message="Contando mensagens do canal...")
         
         messages = []
         kwargs = {}
         if topic_id:
             kwargs['reply_to'] = topic_id
-            
+        
+        count = 0
         async for msg in client.iter_messages(origin, **kwargs):
+            count += 1
+            if count % 500 == 0:
+                update_status(status="analyzing", message=f"Analisando... {count} mensagens verificadas")
             if msg.id not in posted:
                 messages.append(msg)
                 
@@ -255,11 +259,10 @@ async def main():
         total = len(messages)
         
         if total == 0:
-            update_status(status="completed", message="Todas as mensagens já foram clonadas!")
-            await client.disconnect()
+            update_status(status="completed", message=f"Todas as {count} mensagens já foram clonadas!")
             return
 
-        update_status(status="running", message=f"{total} novas mensagens encontradas!")
+        update_status(status="running", message=f"{total} novas mensagens de {count} total!")
         
         for i, msg in enumerate(messages, 1):
             await clone_message(client, msg, dest, posted, origin_id, dest_id, total, i, filters)

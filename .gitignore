@@ -20,3 +20,4 @@ temp_clone/
 # IDEs
 .idea/
 .vscode/
+.render_hook
