@@ -20,7 +20,14 @@
             </div>
             
             <div id="login-step-1">
-                <div class="input-group">
+                <div class="input-group" id="api_credentials_group">
+                    <label>API ID <small><a href="https://my.telegram.org" target="_blank" style="color:var(--secondary);text-decoration:none;">(Obter no Telegram)</a></small></label>
+                    <input type="text" id="api_id" placeholder="Ex: 12345678">
+                    
+                    <label style="margin-top:10px;">API Hash</label>
+                    <input type="text" id="api_hash" placeholder="Ex: 0123456789abcdef0123456789abcdef">
+                </div>
+                <div class="input-group" style="margin-top:15px;">
                     <label>Número de Telefone</label>
                     <input type="text" id="phone_number" placeholder="+55 11 99999-9999">
                 </div>

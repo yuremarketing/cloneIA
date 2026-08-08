@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             if (!data.authorized) {
                 loginModal.style.display = 'flex';
+                if (data.has_keys) {
+                    document.getElementById('api_credentials_group').style.display = 'none';
+                }
             }
         } catch (e) {
             console.error('Failed to check auth', e);
@@ -42,15 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Send Code
     btnSendCode.addEventListener('click', async () => {
         const phone = phoneInput.value.trim();
+        const apiId = document.getElementById('api_id').value.trim();
+        const apiHash = document.getElementById('api_hash').value.trim();
+        
         if(!phone) return alert("Digite o número com DDI (+55...)");
+        
+        // Se a div de credenciais estiver visível, exige os campos
+        if (document.getElementById('api_credentials_group').style.display !== 'none') {
+            if(!apiId || !apiHash) return alert("API ID e API Hash são obrigatórios para a primeira configuração.");
+        }
         
         btnSendCode.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
         btnSendCode.disabled = true;
 
+        const payload = { phone };
+        if (apiId) payload.api_id = apiId;
+        if (apiHash) payload.api_hash = apiHash;
+
         const res = await fetch('/api/auth/send', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ phone })
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
 
@@ -69,15 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
     btnVerifyCode.addEventListener('click', async () => {
         const phone = phoneInput.value.trim();
         const code = codeInput.value.trim();
+        const apiId = document.getElementById('api_id').value.trim();
+        const apiHash = document.getElementById('api_hash').value.trim();
+        
         if(!code) return alert("Digite o código recebido.");
         
         btnVerifyCode.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
         btnVerifyCode.disabled = true;
 
+        const payload = { phone, code, phone_code_hash: currentPhoneHash };
+        if (apiId) payload.api_id = apiId;
+        if (apiHash) payload.api_hash = apiHash;
+
         const res = await fetch('/api/auth/verify', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ phone, code, phone_code_hash: currentPhoneHash })
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
 

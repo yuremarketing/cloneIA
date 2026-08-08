@@ -25,17 +25,51 @@ if not PROGRESS_FILE.exists():
 def index():
     return render_template('index.html')
 
+def get_config():
+    CONFIG_FILE = Path('config.json')
+    if CONFIG_FILE.exists():
+        try:
+            return json.loads(CONFIG_FILE.read_text())
+        except:
+            return {}
+    return {}
+
+def save_config(data):
+    CONFIG_FILE = Path('config.json')
+    current = get_config()
+    current.update(data)
+    CONFIG_FILE.write_text(json.dumps(current))
+
 @app.route('/api/auth/status')
 def auth_status():
-    is_auth = asyncio.run(telegram_auth.check_auth_status())
-    return jsonify({"authorized": is_auth})
+    config = get_config()
+    api_id = config.get('TELEGRAM_API_ID')
+    api_hash = config.get('TELEGRAM_API_HASH')
+    
+    is_auth = False
+    if api_id and api_hash:
+        try:
+            is_auth = asyncio.run(telegram_auth.check_auth_status(api_id, api_hash))
+        except Exception:
+            is_auth = False
+            
+    return jsonify({"authorized": is_auth, "has_keys": bool(api_id and api_hash)})
 
 @app.route('/api/auth/send', methods=['POST'])
 def auth_send():
     phone = request.json.get('phone')
-    if not phone:
-        return jsonify({"success": False, "error": "Telefone é obrigatório."})
-    result = asyncio.run(telegram_auth.send_otp(phone))
+    api_id = request.json.get('api_id')
+    api_hash = request.json.get('api_hash')
+    
+    if not phone or not api_id or not api_hash:
+        return jsonify({"success": False, "error": "Telefone, API ID e API Hash são obrigatórios."})
+        
+    try:
+        api_id = int(api_id)
+    except ValueError:
+        return jsonify({"success": False, "error": "API ID deve ser um número."})
+        
+    result = asyncio.run(telegram_auth.send_otp(phone, api_id, api_hash))
     return jsonify(result)
 
 @app.route('/api/auth/verify', methods=['POST'])
@@ -43,10 +77,26 @@ def auth_verify():
     phone = request.json.get('phone')
     code = request.json.get('code')
     phone_code_hash = request.json.get('phone_code_hash')
-    if not all([phone, code, phone_code_hash]):
+    api_id = request.json.get('api_id')
+    api_hash = request.json.get('api_hash')
+    
+    if not all([phone, code, phone_code_hash, api_id, api_hash]):
         return jsonify({"success": False, "error": "Dados incompletos."})
     
-    result = asyncio.run(telegram_auth.verify_otp(phone, code, phone_code_hash))
+    try:
+        api_id = int(api_id)
+    except:
+        pass
+        
+    result = asyncio.run(telegram_auth.verify_otp(phone, code, phone_code_hash, api_id, api_hash))
+    
+    if result.get("success"):
+        # Salva as credenciais permanentemente no config.json após sucesso
+        save_config({
+            'TELEGRAM_API_ID': api_id,
+            'TELEGRAM_API_HASH': api_hash
+        })
+        
     return jsonify(result)
 
 

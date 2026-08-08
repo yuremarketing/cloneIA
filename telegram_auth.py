@@ -2,25 +2,32 @@ import os
 import asyncio
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError, PhoneNumberInvalidError
-from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
-
-API_ID = os.getenv('TELEGRAM_API_ID')
-API_HASH = os.getenv('TELEGRAM_API_HASH')
 SESSION = 'cloneia_session'
 
-async def check_auth_status():
-    if not API_ID or not API_HASH:
+async def check_auth_status(api_id, api_hash):
+    if not api_id or not api_hash:
         return False
-    client = TelegramClient(SESSION, API_ID, API_HASH)
-    await client.connect()
-    is_authorized = await client.is_user_authorized()
-    await client.disconnect()
-    return is_authorized
+    
+    # Se o arquivo de sessão não existir fisicamente, não tenta conectar (para não criar arquivo atoa)
+    if not Path(f"{SESSION}.session").exists():
+        return False
 
-async def send_otp(phone):
-    client = TelegramClient(SESSION, API_ID, API_HASH)
+    client = TelegramClient(SESSION, api_id, api_hash)
+    try:
+        await client.connect()
+        is_authorized = await client.is_user_authorized()
+        await client.disconnect()
+        return is_authorized
+    except Exception:
+        return False
+
+async def send_otp(phone, api_id, api_hash):
+    if not api_id or not api_hash:
+        return {"success": False, "error": "API ID e API Hash são obrigatórios."}
+        
+    client = TelegramClient(SESSION, api_id, api_hash)
     await client.connect()
     try:
         sent = await client.send_code_request(phone)
@@ -32,8 +39,8 @@ async def send_otp(phone):
     finally:
         await client.disconnect()
 
-async def verify_otp(phone, code, phone_code_hash):
-    client = TelegramClient(SESSION, API_ID, API_HASH)
+async def verify_otp(phone, code, phone_code_hash, api_id, api_hash):
+    client = TelegramClient(SESSION, api_id, api_hash)
     await client.connect()
     try:
         await client.sign_in(phone=phone, code=code, phone_code_hash=phone_code_hash)

@@ -11,16 +11,6 @@ import re
 from pathlib import Path
 from telethon import TelegramClient
 from telethon.errors import FloodWaitError
-from dotenv import load_dotenv
-
-load_dotenv()
-
-API_ID = os.getenv('TELEGRAM_API_ID')
-API_HASH = os.getenv('TELEGRAM_API_HASH')
-
-if not API_ID or not API_HASH:
-    print("❌ ERRO: Configure o TELEGRAM_API_ID e TELEGRAM_API_HASH no arquivo .env")
-    sys.exit(1)
 
 SESSION = 'cloneia_session'
 CACHE_DIR = Path('clone_cache')
@@ -228,7 +218,15 @@ async def main():
     TEMP_DIR.mkdir(parents=True, exist_ok=True)
     update_status(status="starting", message="Conectando ao Telegram...")
     
-    client = TelegramClient(SESSION, API_ID, API_HASH)
+    api_id = filters.get('TELEGRAM_API_ID')
+    api_hash = filters.get('TELEGRAM_API_HASH')
+    
+    if not api_id or not api_hash:
+        update_status(status="error", message="API ID ou Hash não configurados no Painel Web.")
+        print("❌ Erro: API_ID e API_HASH não encontrados no config.json")
+        sys.exit(1)
+
+    client = TelegramClient(SESSION, api_id, api_hash)
     await client.connect()
     
     if not await client.is_user_authorized():
