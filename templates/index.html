@@ -11,6 +11,32 @@
 <body>
     <div class="bg-glow"></div>
     
+    <!-- Modal de Login do Telegram -->
+    <div id="login-modal" class="modal-overlay" style="display: none;">
+        <div class="glass-card modal-content">
+            <div class="card-header text-center">
+                <h2><i class="fa-brands fa-telegram"></i> Conectar Telegram</h2>
+                <p>É necessário fazer login para usar a API.</p>
+            </div>
+            
+            <div id="login-step-1">
+                <div class="input-group">
+                    <label>Número de Telefone</label>
+                    <input type="text" id="phone_number" placeholder="+55 11 99999-9999">
+                </div>
+                <button class="btn-glow" id="btn-send-code">ENVIAR CÓDIGO</button>
+            </div>
+
+            <div id="login-step-2" style="display: none;">
+                <div class="input-group">
+                    <label>Código Recebido</label>
+                    <input type="text" id="otp_code" placeholder="Digite os 5 números">
+                </div>
+                <button class="btn-glow" id="btn-verify-code">ENTRAR</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <header>
             <div class="logo">

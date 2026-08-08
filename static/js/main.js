@@ -13,7 +13,83 @@ document.addEventListener('DOMContentLoaded', () => {
     const elProgPercent = document.getElementById('progress-percent');
     const elProgBar = document.getElementById('progress-bar');
     
+    // Auth elements
+    const loginModal = document.getElementById('login-modal');
+    const step1 = document.getElementById('login-step-1');
+    const step2 = document.getElementById('login-step-2');
+    const btnSendCode = document.getElementById('btn-send-code');
+    const btnVerifyCode = document.getElementById('btn-verify-code');
+    const phoneInput = document.getElementById('phone_number');
+    const codeInput = document.getElementById('otp_code');
+    
     let pollingInterval = null;
+    let currentPhoneHash = null;
+
+    // Check Auth Status on Load
+    async function checkAuth() {
+        try {
+            const res = await fetch('/api/auth/status');
+            const data = await res.json();
+            if (!data.authorized) {
+                loginModal.style.display = 'flex';
+            }
+        } catch (e) {
+            console.error('Failed to check auth', e);
+        }
+    }
+    checkAuth();
+
+    // Send Code
+    btnSendCode.addEventListener('click', async () => {
+        const phone = phoneInput.value.trim();
+        if(!phone) return alert("Digite o número com DDI (+55...)");
+        
+        btnSendCode.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btnSendCode.disabled = true;
+
+        const res = await fetch('/api/auth/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            currentPhoneHash = data.phone_code_hash;
+            step1.style.display = 'none';
+            step2.style.display = 'block';
+        } else {
+            alert(data.error);
+        }
+        btnSendCode.innerHTML = 'ENVIAR CÓDIGO';
+        btnSendCode.disabled = false;
+    });
+
+    // Verify Code
+    btnVerifyCode.addEventListener('click', async () => {
+        const phone = phoneInput.value.trim();
+        const code = codeInput.value.trim();
+        if(!code) return alert("Digite o código recebido.");
+        
+        btnVerifyCode.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btnVerifyCode.disabled = true;
+
+        const res = await fetch('/api/auth/verify', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ phone, code, phone_code_hash: currentPhoneHash })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            loginModal.style.display = 'none';
+            alert("Autenticado com sucesso!");
+        } else {
+            alert(data.error);
+        }
+        btnVerifyCode.innerHTML = 'ENTRAR';
+        btnVerifyCode.disabled = false;
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();

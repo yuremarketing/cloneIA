@@ -1,9 +1,10 @@
 import os
 import json
 import subprocess
+import asyncio
 from flask import Flask, render_template, jsonify, request
 from pathlib import Path
-
+import telegram_auth
 app = Flask(__name__)
 PROGRESS_FILE = Path('progress.json')
 
@@ -23,6 +24,31 @@ if not PROGRESS_FILE.exists():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/api/auth/status')
+def auth_status():
+    is_auth = asyncio.run(telegram_auth.check_auth_status())
+    return jsonify({"authorized": is_auth})
+
+@app.route('/api/auth/send', methods=['POST'])
+def auth_send():
+    phone = request.json.get('phone')
+    if not phone:
+        return jsonify({"success": False, "error": "Telefone é obrigatório."})
+    result = asyncio.run(telegram_auth.send_otp(phone))
+    return jsonify(result)
+
+@app.route('/api/auth/verify', methods=['POST'])
+def auth_verify():
+    phone = request.json.get('phone')
+    code = request.json.get('code')
+    phone_code_hash = request.json.get('phone_code_hash')
+    if not all([phone, code, phone_code_hash]):
+        return jsonify({"success": False, "error": "Dados incompletos."})
+    
+    result = asyncio.run(telegram_auth.verify_otp(phone, code, phone_code_hash))
+    return jsonify(result)
+
 
 @app.route('/api/progress')
 def get_progress():

@@ -232,9 +232,10 @@ async def main():
     await client.connect()
     
     if not await client.is_user_authorized():
-        update_status(status="error", message="Autenticação necessária via Terminal!")
-        print("📲 Autenticação necessária! Siga os passos no terminal.")
-        await client.start()
+        update_status(status="error", message="Não autorizado. Faça o login no Painel Web.")
+        print("❌ Erro: Autenticação necessária. Acesse o Painel Web para fazer o login.")
+        await client.disconnect()
+        return
         
     origin = await client.get_entity(origin_id)
     dest = await client.get_entity(dest_id)
