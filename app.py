@@ -108,8 +108,11 @@ def get_chats():
     if not api_id or not api_hash:
         return jsonify({"success": False, "error": "Chaves não configuradas"})
         
-    result = asyncio.run(telegram_auth.get_user_chats(api_id, api_hash))
-    return jsonify(result)
+    try:
+        result = asyncio.run(telegram_auth.get_user_chats(api_id, api_hash))
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Falha ao buscar chats: {str(e)}"})
 
 
 @app.route('/api/progress')
