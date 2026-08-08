@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloneIA - Pro Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="bg-glow"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fa-brands fa-telegram"></i>
+                <h1>Clone<span>IA</span></h1>
+                <span class="pro-badge">PRO</span>
+            </div>
+            <div class="status-indicator" id="connection-status">
+                <span class="dot"></span> Online
+            </div>
+        </header>
+
+        <main>
+            <!-- Painel de Estatísticas -->
+            <section class="stats-grid" id="stats-panel" style="display: none;">
+                <div class="stat-card">
+                    <i class="fa-solid fa-file-export"></i>
+                    <div class="stat-info">
+                        <h3>Mensagens</h3>
+                        <p id="stat-msgs">0 / 0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-hard-drive"></i>
+                    <div class="stat-info">
+                        <h3>Tráfego Atual</h3>
+                        <p id="stat-traffic">0 MB</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div class="stat-info">
+                        <h3>Ação</h3>
+                        <p id="stat-action" class="text-neon">Aguardando</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card Principal -->
+            <div class="glass-card">
+                
+                <!-- Formulário de Nova Clonagem -->
+                <div id="setup-view">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-rocket"></i> Nova Clonagem</h2>
+                        <p>Configure os IDs para iniciar o processo de bypass.</p>
+                    </div>
+                    
+                    <form id="clone-form">
+                        <div class="input-group">
+                            <label><i class="fa-solid fa-arrow-right-from-bracket"></i> ID de Origem</label>
+                            <input type="text" id="origin" placeholder="Ex: -100123456789" required>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fa-solid fa-arrow-right-to-bracket"></i> ID de Destino</label>
+                            <input type="text" id="dest" placeholder="Ex: -100987654321" required>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fa-solid fa-hashtag"></i> ID do Tópico (Opcional)</label>
+                            <input type="text" id="topic" placeholder="Deixe em branco para o canal todo">
+                        </div>
+                        
+                        <button type="submit" class="btn-glow" id="btn-start">
+                            <span>INICIAR CLONAGEM</span>
+                            <i class="fa-solid fa-bolt"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Visão de Progresso -->
+                <div id="progress-view" style="display: none;">
+                    <div class="card-header text-center">
+                        <div class="loader-ring"></div>
+                        <h2 id="current-message">Processando...</h2>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span id="progress-text">0.0 MB / 0.0 MB</span>
+                            <span id="progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
