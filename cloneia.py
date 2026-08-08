@@ -226,46 +226,53 @@ async def main():
         print("❌ Erro: API_ID e API_HASH não encontrados no config.json")
         sys.exit(1)
 
-    client = TelegramClient(SESSION, api_id, api_hash)
-    await client.connect()
-    
-    if not await client.is_user_authorized():
-        update_status(status="error", message="Não autorizado. Faça o login no Painel Web.")
-        print("❌ Erro: Autenticação necessária. Acesse o Painel Web para fazer o login.")
-        await client.disconnect()
-        return
+    try:
+        client = TelegramClient(SESSION, api_id, api_hash)
+        await client.connect()
         
-    origin = await client.get_entity(origin_id)
-    dest = await client.get_entity(dest_id)
-    
-    posted = load_posted(origin_id, dest_id)
-    update_status(status="analyzing", message="Buscando mensagens...")
-    
-    messages = []
-    kwargs = {}
-    if topic_id:
-        kwargs['reply_to'] = topic_id
-        
-    async for msg in client.iter_messages(origin, **kwargs):
-        if msg.id not in posted:
-            messages.append(msg)
+        if not await client.is_user_authorized():
+            update_status(status="error", message="Não autorizado. Faça o login no Painel Web.")
+            print("❌ Erro: Autenticação necessária. Acesse o Painel Web para fazer o login.")
+            await client.disconnect()
+            return
             
-    messages.reverse()
-    total = len(messages)
-    
-    if total == 0:
-        update_status(status="completed", message="Todas as mensagens já foram clonadas!")
-        await client.disconnect()
-        return
-
-    update_status(status="running", message=f"{total} novas mensagens encontradas!")
-    
-    for i, msg in enumerate(messages, 1):
-        await clone_message(client, msg, dest, posted, origin_id, dest_id, total, i, filters)
-        await asyncio.sleep(1)
+        origin = await client.get_entity(origin_id)
+        dest = await client.get_entity(dest_id)
         
-    update_status(status="completed", message="Clonagem Completa!", percent=100)
-    await client.disconnect()
+        posted = load_posted(origin_id, dest_id)
+        update_status(status="analyzing", message="Buscando mensagens...")
+        
+        messages = []
+        kwargs = {}
+        if topic_id:
+            kwargs['reply_to'] = topic_id
+            
+        async for msg in client.iter_messages(origin, **kwargs):
+            if msg.id not in posted:
+                messages.append(msg)
+                
+        messages.reverse()
+        total = len(messages)
+        
+        if total == 0:
+            update_status(status="completed", message="Todas as mensagens já foram clonadas!")
+            await client.disconnect()
+            return
+
+        update_status(status="running", message=f"{total} novas mensagens encontradas!")
+        
+        for i, msg in enumerate(messages, 1):
+            await clone_message(client, msg, dest, posted, origin_id, dest_id, total, i, filters)
+            await asyncio.sleep(1)
+            
+        update_status(status="completed", message="Clonagem Completa!", percent=100)
+    except Exception as e:
+        error_msg = f"Erro na inicialização: {str(e)}"
+        print(f"❌ {error_msg}")
+        update_status(status="error", message=error_msg)
+    finally:
+        if 'client' in locals() and client.is_connected():
+            await client.disconnect()
 
 if __name__ == '__main__':
     asyncio.run(main())
