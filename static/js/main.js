@@ -54,9 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 datalist.innerHTML = '';
                 data.chats.forEach(chat => {
                     const option = document.createElement('option');
-                    // O value é o ID (que será inserido no input) e o texto mostra o Nome
-                    option.value = chat.username ? `@${chat.username}` : chat.id;
-                    option.textContent = chat.title;
+                    const identifier = chat.username ? `@${chat.username}` : chat.id;
+                    option.value = `${chat.title} | ${identifier}`;
                     datalist.appendChild(option);
                 });
             }
@@ -139,9 +138,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const origin = document.getElementById('origin').value;
-        const dest = document.getElementById('dest').value;
-        const topic = document.getElementById('topic').value;
+        
+        let origin = document.getElementById('origin').value.trim();
+        let dest = document.getElementById('dest').value.trim();
+        
+        if (origin.includes(' | ')) {
+            origin = origin.split(' | ')[1];
+        }
+        if (dest.includes(' | ')) {
+            dest = dest.split(' | ')[1];
+        }
+        
+        const topic = document.getElementById('topic').value.trim();
 
         // Enterprise Filters
         const filters = {
