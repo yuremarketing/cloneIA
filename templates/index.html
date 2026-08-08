@@ -103,9 +103,15 @@
                             <label><i class="fa-solid fa-arrow-right-to-bracket"></i> ID ou Link de Destino</label>
                             <input type="text" id="dest" list="chat-list" placeholder="Ex: @MeuCanal ou -100987654321" required>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group" id="topic-container">
                             <label><i class="fa-solid fa-hashtag"></i> ID do Tópico (Opcional)</label>
                             <input type="text" id="topic" placeholder="Deixe em branco para o canal todo">
+                            <select id="topic-select" style="display: none;" class="form-control">
+                                <option value="">Canal Inteiro (Todos os tópicos)</option>
+                            </select>
+                            <div id="topic-loading" style="display: none; font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Buscando tópicos...
+                            </div>
                         </div>
 
                         <!-- SEÇÃO DE FILTROS ENTERPRISE -->

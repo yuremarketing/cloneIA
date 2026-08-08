@@ -159,6 +159,60 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Falha de rede ao buscar lista de chats.', 'error');
         }
     }
+    
+    // ============================================================
+    // 🗂️ BUSCA DE TÓPICOS DO CANAL/GRUPO (SE HOUVER)
+    // ============================================================
+    const originInput = document.getElementById('origin');
+    const topicInput = document.getElementById('topic');
+    const topicSelect = document.getElementById('topic-select');
+    const topicLoading = document.getElementById('topic-loading');
+
+    // Função para extrair o ID numérico da string (ex: "FoxConcursos | -1001234")
+    function extractChatId(inputString) {
+        if (!inputString) return null;
+        const parts = inputString.split('|');
+        let idPart = parts.length > 1 ? parts[1].trim() : parts[0].trim();
+        return idPart;
+    }
+
+    originInput.addEventListener('blur', async () => {
+        const rawOrigin = originInput.value.trim();
+        if (!rawOrigin) return;
+        
+        const chatId = extractChatId(rawOrigin);
+        
+        // Reset topic UI
+        topicInput.style.display = 'block';
+        topicSelect.style.display = 'none';
+        topicSelect.innerHTML = '<option value="">Canal Inteiro (Todos os tópicos)</option>';
+        topicInput.value = '';
+        
+        topicLoading.style.display = 'block';
+        
+        try {
+            const res = await fetch(`/api/topics?chat_id=${encodeURIComponent(chatId)}`);
+            const data = await res.json();
+            
+            if (data.success && data.topics && data.topics.length > 0) {
+                // Tem tópicos, muda a UI pro Select
+                topicInput.style.display = 'none';
+                topicSelect.style.display = 'block';
+                
+                data.topics.forEach(topic => {
+                    const option = document.createElement('option');
+                    option.value = topic.id;
+                    option.textContent = topic.title;
+                    topicSelect.appendChild(option);
+                });
+                showToast(`Encontrados ${data.topics.length} tópicos neste grupo!`, 'info');
+            }
+        } catch (e) {
+            console.error("Erro ao buscar tópicos:", e);
+        } finally {
+            topicLoading.style.display = 'none';
+        }
+    });
 
     // ============================================================
     // 📲 ENVIO DE CÓDIGO
@@ -270,8 +324,12 @@ document.addEventListener('DOMContentLoaded', () => {
             dest = dest.split(' | ')[1];
         }
         
-        const topic = document.getElementById('topic').value.trim();
-
+        let topic = '';
+        if (document.getElementById('topic-select').style.display !== 'none') {
+            topic = document.getElementById('topic-select').value;
+        } else {
+            topic = document.getElementById('topic').value.trim();
+        }
         // Enterprise Filters
         const filters = {
             f_text: document.getElementById('f_text').checked,

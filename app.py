@@ -118,6 +118,31 @@ def get_chats():
     except Exception as e:
         return jsonify({"success": False, "error": f"Falha ao buscar chats: {str(e)}"})
 
+@app.route('/api/topics')
+def get_topics():
+    chat_id = request.args.get('chat_id')
+    if not chat_id:
+        return jsonify({"success": False, "error": "chat_id is required"})
+        
+    # Handle int conversion if possible
+    try:
+        if chat_id.lstrip('-').isdigit():
+            chat_id = int(chat_id)
+    except ValueError:
+        pass
+        
+    config = get_config()
+    api_id = config.get('TELEGRAM_API_ID')
+    api_hash = config.get('TELEGRAM_API_HASH')
+    
+    if not api_id or not api_hash:
+        return jsonify({"success": False, "error": "Chaves não configuradas"})
+        
+    try:
+        result = asyncio.run(telegram_auth.get_forum_topics(api_id, api_hash, chat_id))
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Falha ao buscar tópicos: {str(e)}"})
 
 @app.route('/api/progress')
 def get_progress():

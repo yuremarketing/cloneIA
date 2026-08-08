@@ -2,6 +2,7 @@ import os
 import asyncio
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError, PhoneNumberInvalidError
+from telethon.tl.functions.messages import GetForumTopicsRequest
 from pathlib import Path
 
 SESSION = 'cloneia_session'
@@ -73,6 +74,42 @@ async def get_user_chats(api_id, api_hash):
                 }
                 chats.append(chat_info)
         return {"success": True, "chats": chats}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    finally:
+        await client.disconnect()
+
+async def get_forum_topics(api_id, api_hash, chat_id):
+    if not api_id or not api_hash:
+        return {"success": False, "topics": []}
+        
+    client = TelegramClient(SESSION, api_id, api_hash)
+    try:
+        await client.connect()
+        if not await client.is_user_authorized():
+            return {"success": False, "error": "Unauthorized"}
+            
+        try:
+            entity = await client.get_entity(chat_id)
+            result = await client(GetForumTopicsRequest(
+                channel=entity,
+                offset_date=0,
+                offset_id=0,
+                offset_topic=0,
+                limit=100
+            ))
+            
+            topics = []
+            for topic in getattr(result, 'topics', []):
+                topics.append({
+                    "id": topic.id,
+                    "title": getattr(topic, 'title', f'Topic {topic.id}')
+                })
+                
+            return {"success": True, "topics": topics}
+        except Exception as e:
+            # Not a forum or other error
+            return {"success": False, "error": str(e), "topics": []}
     except Exception as e:
         return {"success": False, "error": str(e)}
     finally:
