@@ -40,9 +40,14 @@ def start_cloning():
     origin = data.get('origin')
     dest = data.get('dest')
     topic = data.get('topic', '')
+    filters = data.get('filters', {})
 
     if not origin or not dest:
         return jsonify({"success": False, "error": "ID de Origem e Destino são obrigatórios."})
+
+    # Salva os filtros no config.json
+    CONFIG_FILE = Path('config.json')
+    CONFIG_FILE.write_text(json.dumps(filters))
 
     # Reseta o progresso
     PROGRESS_FILE.write_text(json.dumps({

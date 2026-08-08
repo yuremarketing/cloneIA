@@ -21,6 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const dest = document.getElementById('dest').value;
         const topic = document.getElementById('topic').value;
 
+        // Enterprise Filters
+        const filters = {
+            f_text: document.getElementById('f_text').checked,
+            f_photo: document.getElementById('f_photo').checked,
+            f_video: document.getElementById('f_video').checked,
+            f_document: document.getElementById('f_document').checked,
+            f_audio: document.getElementById('f_audio').checked,
+            remove_links: document.getElementById('remove_links').checked,
+            remove_mentions: document.getElementById('remove_mentions').checked,
+            blacklist: document.getElementById('blacklist').value,
+            replace_from: document.getElementById('replace_from').value,
+            replace_to: document.getElementById('replace_to').value,
+            signature: document.getElementById('signature').value
+        };
+
         const btn = document.getElementById('btn-start');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando...';
         btn.disabled = true;
@@ -29,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin, dest, topic })
+                body: JSON.stringify({ origin, dest, topic, filters })
             });
             const data = await res.json();
             

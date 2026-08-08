@@ -72,6 +72,54 @@
                             <label><i class="fa-solid fa-hashtag"></i> ID do Tópico (Opcional)</label>
                             <input type="text" id="topic" placeholder="Deixe em branco para o canal todo">
                         </div>
+
+                        <!-- SEÇÃO DE FILTROS ENTERPRISE -->
+                        <div class="filters-section">
+                            <h3 class="section-subtitle"><i class="fa-solid fa-filter"></i> Filtros de Mídia</h3>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="f_text" checked> Textos</label>
+                                <label><input type="checkbox" id="f_photo" checked> Fotos</label>
+                                <label><input type="checkbox" id="f_video" checked> Vídeos</label>
+                                <label><input type="checkbox" id="f_document" checked> Documentos</label>
+                                <label><input type="checkbox" id="f_audio" checked> Áudios</label>
+                            </div>
+
+                            <h3 class="section-subtitle mt-4"><i class="fa-solid fa-wand-magic-sparkles"></i> Tratamento de Texto</h3>
+                            
+                            <div class="switch-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="remove_links">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span>Remover Links (http/www)</span>
+                            </div>
+
+                            <div class="switch-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="remove_mentions">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span>Remover Menções (@usuário)</span>
+                            </div>
+
+                            <div class="input-group mt-3">
+                                <label><i class="fa-solid fa-ban"></i> Blacklist (Ignorar se contiver)</label>
+                                <input type="text" id="blacklist" placeholder="Palavras separadas por vírgula">
+                            </div>
+
+                            <div class="input-group">
+                                <label><i class="fa-solid fa-pen-to-square"></i> Substituir Texto (Opcional)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="replace_from" placeholder="Buscar por...">
+                                    <input type="text" id="replace_to" placeholder="Substituir por...">
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label><i class="fa-solid fa-signature"></i> Assinatura Automática</label>
+                                <input type="text" id="signature" placeholder="Ex: Canal Vip @MeuCanal">
+                            </div>
+                        </div>
                         
                         <button type="submit" class="btn-glow" id="btn-start">
                             <span>INICIAR CLONAGEM</span>
