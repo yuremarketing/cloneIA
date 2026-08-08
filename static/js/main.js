@@ -35,12 +35,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.has_keys) {
                     document.getElementById('api_credentials_group').style.display = 'none';
                 }
+            } else {
+                fetchChats();
             }
         } catch (e) {
             console.error('Failed to check auth', e);
         }
     }
     checkAuth();
+    
+    // Fetch and populate chats
+    async function fetchChats() {
+        try {
+            const res = await fetch('/api/chats');
+            const data = await res.json();
+            if (data.success && data.chats) {
+                const datalist = document.getElementById('chat-list');
+                datalist.innerHTML = '';
+                data.chats.forEach(chat => {
+                    const option = document.createElement('option');
+                    // O value é o ID (que será inserido no input) e o texto mostra o Nome
+                    option.value = chat.username ? `@${chat.username}` : chat.id;
+                    option.textContent = chat.title;
+                    datalist.appendChild(option);
+                });
+            }
+        } catch (e) {
+            console.error('Failed to fetch chats', e);
+        }
+    }
 
     // Send Code
     btnSendCode.addEventListener('click', async () => {
@@ -106,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success) {
             loginModal.style.display = 'none';
             alert("Autenticado com sucesso!");
+            fetchChats();
         } else {
             alert(data.error);
         }

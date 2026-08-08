@@ -51,3 +51,29 @@ async def verify_otp(phone, code, phone_code_hash, api_id, api_hash):
         return {"success": False, "error": str(e)}
     finally:
         await client.disconnect()
+
+async def get_user_chats(api_id, api_hash):
+    if not api_id or not api_hash:
+        return {"success": False, "chats": []}
+        
+    client = TelegramClient(SESSION, api_id, api_hash)
+    try:
+        await client.connect()
+        if not await client.is_user_authorized():
+            return {"success": False, "error": "Unauthorized"}
+            
+        chats = []
+        async for dialog in client.iter_dialogs():
+            if dialog.is_channel or dialog.is_group:
+                # Inclui o nome da entidade, o ID, e o username se tiver
+                chat_info = {
+                    "id": dialog.id,
+                    "title": dialog.name,
+                    "username": dialog.entity.username if hasattr(dialog.entity, 'username') else None
+                }
+                chats.append(chat_info)
+        return {"success": True, "chats": chats}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    finally:
+        await client.disconnect()

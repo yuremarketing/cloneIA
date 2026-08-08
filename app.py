@@ -99,6 +99,18 @@ def auth_verify():
         
     return jsonify(result)
 
+@app.route('/api/chats', methods=['GET'])
+def get_chats():
+    config = get_config()
+    api_id = config.get('TELEGRAM_API_ID')
+    api_hash = config.get('TELEGRAM_API_HASH')
+    
+    if not api_id or not api_hash:
+        return jsonify({"success": False, "error": "Chaves não configuradas"})
+        
+    result = asyncio.run(telegram_auth.get_user_chats(api_id, api_hash))
+    return jsonify(result)
+
 
 @app.route('/api/progress')
 def get_progress():

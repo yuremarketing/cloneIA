@@ -93,13 +93,15 @@
                     </div>
                     
                     <form id="clone-form">
+                        <datalist id="chat-list"></datalist>
+
                         <div class="input-group">
                             <label><i class="fa-solid fa-arrow-right-from-bracket"></i> ID ou Link de Origem</label>
-                            <input type="text" id="origin" placeholder="Ex: @FoxConcursos, https://t.me/canal ou -100123456789" required>
+                            <input type="text" id="origin" list="chat-list" placeholder="Ex: @FoxConcursos, https://t.me/canal ou -100123456789" required>
                         </div>
                         <div class="input-group">
                             <label><i class="fa-solid fa-arrow-right-to-bracket"></i> ID ou Link de Destino</label>
-                            <input type="text" id="dest" placeholder="Ex: @MeuCanal ou -100987654321" required>
+                            <input type="text" id="dest" list="chat-list" placeholder="Ex: @MeuCanal ou -100987654321" required>
                         </div>
                         <div class="input-group">
                             <label><i class="fa-solid fa-hashtag"></i> ID do Tópico (Opcional)</label>
