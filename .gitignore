@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Telegram Session & Cache (CRITICAL FOR SECURITY)
+*.session
+*.session-journal
+clone_cache/
+temp_clone/
+
+# IDEs
+.idea/
+.vscode/
